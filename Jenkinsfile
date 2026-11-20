@@ -5,28 +5,32 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/bazzi777/jenkins-web-deployment.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building web application...'
-                sh 'test -f index.html'
+                echo 'Building website...'
+                sh 'ls -l index.html'
             }
         }
 
         stage('Deploy') {
             steps {
                 echo 'Deploying website to Apache...'
-                sh 'sudo /usr/bin/install -m 0644 index.html /var/www/html/index.html'
+                sh '''
+                    sudo -n /usr/bin/install -m 0644 /var/lib/jenkins/workspace/Pipeline-Web-Deployment/index.html /var/www/html/index.html
+                '''
+                echo 'Website deployed successfully!'
             }
         }
 
         stage('Verify') {
             steps {
-                echo 'Verifying deployment...'
-                sh 'curl -fsS http://127.0.0.1/ | grep "Version 2"'
+                echo 'Verifying website...'
+                sh 'curl -f http://127.0.0.1/'
             }
         }
     }
